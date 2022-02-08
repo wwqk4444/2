@@ -23,7 +23,7 @@ import (
 	"github.com/zhengying/shadowsocks-go/redir"
 	"github.com/zhengying/shadowsocks-go/shadowsocks"
 	"github.com/zhengying/smux"
-	"github.com/zhengying/ccsexyz_utils"
+	utils "github.com/zhengying/ccsexyz_utils"
 	"github.com/golang/snappy"
 	"github.com/pkg/errors"
 	"github.com/urfave/cli"
