@@ -326,14 +326,16 @@ func main() {
 	myApp.Version = VERSION
 	myApp.Flags = []cli.Flag{
 		&cli.StringFlag{
-			Name:  "localaddr,l",
-			Value: ":12948",
-			Usage: "local listen address",
+			Name:    "localaddr",
+			Aliases: []string{"l"},
+			Value:   ":12948",
+			Usage:   "local listen address",
 		},
 		&cli.StringFlag{
-			Name:  "remoteaddr, r",
-			Value: "vps:29900",
-			Usage: "kcp server address",
+			Name:    "remoteaddr",
+			Aliases: []string{"r"},
+			Value:   "vps:29900",
+			Usage:   "kcp server address",
 		},
 		&cli.StringFlag{
 			Name:    "key",
