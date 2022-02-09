@@ -19,13 +19,13 @@ import (
 	"os/signal"
 	"syscall"
 
+	"github.com/golang/snappy"
+	"github.com/urfave/cli"
+	utils "github.com/zhengying/ccsexyz_utils"
+	kcp "github.com/zhengying/kcp-go"
 	kcpraw "github.com/zhengying/kcp-go-raw"
 	ss "github.com/zhengying/shadowsocks-go/shadowsocks"
 	"github.com/zhengying/smux"
-	"github.com/zhengying/ccsexyz_utils"
-	"github.com/golang/snappy"
-	"github.com/urfave/cli"
-	kcp "github.com/zhengying/kcp-go"
 )
 
 var (
@@ -202,147 +202,149 @@ func main() {
 	myApp.Usage = "server(with SMUX)"
 	myApp.Version = VERSION
 	myApp.Flags = []cli.Flag{
-		cli.StringFlag{
-			Name:  "listen,l",
-			Value: ":29900",
-			Usage: "kcp server listen address",
+		&cli.StringFlag{
+			Name:    "listen",
+			Aliases: []string{"l"},
+			Value:   ":29900",
+			Usage:   "kcp server listen address",
 		},
-		cli.StringFlag{
-			Name:  "target, t",
-			Value: "127.0.0.1:12948",
-			Usage: "target server address",
+		&cli.StringFlag{
+			Name:    "target",
+			Aliases: []string{"t"},
+			Value:   "127.0.0.1:12948",
+			Usage:   "target server address",
 		},
-		cli.StringFlag{
-			Name:   "key",
-			Value:  "it's a secrect",
-			Usage:  "pre-shared secret between client and server",
-			EnvVar: "KCPTUN_KEY",
+		&cli.StringFlag{
+			Name:    "key",
+			Value:   "it's a secrect",
+			Usage:   "pre-shared secret between client and server",
+			EnvVars: []string{"KCPTUN_KEY"},
 		},
-		cli.StringFlag{
+		&cli.StringFlag{
 			Name:  "crypt",
 			Value: "aes",
 			Usage: "aes, aes-128, aes-192, chacha20, salsa20, blowfish, twofish, cast5, 3des, tea, xtea, xor, sm4, none",
 		},
-		cli.StringFlag{
+		&cli.StringFlag{
 			Name:  "mode",
 			Value: "fast",
 			Usage: "profiles: fast3, fast2, fast, normal, manual",
 		},
-		cli.IntFlag{
+		&cli.IntFlag{
 			Name:  "mtu",
 			Value: 1350,
 			Usage: "set maximum transmission unit for UDP packets",
 		},
-		cli.IntFlag{
+		&cli.IntFlag{
 			Name:  "sndwnd",
 			Value: 1024,
 			Usage: "set send window size(num of packets)",
 		},
-		cli.IntFlag{
+		&cli.IntFlag{
 			Name:  "rcvwnd",
 			Value: 1024,
 			Usage: "set receive window size(num of packets)",
 		},
-		cli.IntFlag{
+		&cli.IntFlag{
 			Name:  "datashard,ds",
 			Value: 10,
 			Usage: "set reed-solomon erasure coding - datashard",
 		},
-		cli.IntFlag{
+		&cli.IntFlag{
 			Name:  "parityshard,ps",
 			Value: 3,
 			Usage: "set reed-solomon erasure coding - parityshard",
 		},
-		cli.IntFlag{
+		&cli.IntFlag{
 			Name:  "dscp",
 			Value: 0,
 			Usage: "set dscp(6bit)",
 		},
-		cli.BoolFlag{
+		&cli.BoolFlag{
 			Name:  "nocomp",
 			Usage: "disable compression",
 		},
-		cli.BoolFlag{
+		&cli.BoolFlag{
 			Name:  "usemul",
 			Usage: "use multiple underlying conns for one kcp connection",
 		},
-		cli.BoolFlag{
+		&cli.BoolFlag{
 			Name:   "acknodelay",
 			Usage:  "flush ack immediately when a packet is received",
 			Hidden: true,
 		},
-		cli.IntFlag{
+		&cli.IntFlag{
 			Name:   "nodelay",
 			Value:  0,
 			Hidden: true,
 		},
-		cli.IntFlag{
+		&cli.IntFlag{
 			Name:   "interval",
 			Value:  40,
 			Hidden: true,
 		},
-		cli.IntFlag{
+		&cli.IntFlag{
 			Name:   "resend",
 			Value:  0,
 			Hidden: true,
 		},
-		cli.IntFlag{
+		&cli.IntFlag{
 			Name:   "nc",
 			Value:  0,
 			Hidden: true,
 		},
-		cli.IntFlag{
+		&cli.IntFlag{
 			Name:   "sockbuf",
 			Value:  4194304, // socket buffer size in bytes
 			Hidden: true,
 		},
-		cli.IntFlag{
+		&cli.IntFlag{
 			Name:   "keepalive",
 			Value:  10, // nat keepalive interval in seconds
 			Hidden: true,
 		},
-		cli.StringFlag{
+		&cli.StringFlag{
 			Name:  "snmplog",
 			Value: "",
 			Usage: "collect snmp to file, aware of timeformat in golang, like: ./snmp-20060102.log",
 		},
-		cli.IntFlag{
+		&cli.IntFlag{
 			Name:  "snmpperiod",
 			Value: 60,
 			Usage: "snmp collect period, in seconds",
 		},
-		cli.StringFlag{
+		&cli.StringFlag{
 			Name:  "log",
 			Value: "",
 			Usage: "specify a log file to output, default goes to stderr",
 		},
-		cli.StringFlag{
+		&cli.StringFlag{
 			Name:  "c",
 			Value: "", // when the value is not empty, the config path must exists
 			Usage: "config from json file, which will override the command from shell",
 		},
-		cli.BoolFlag{
+		&cli.BoolFlag{
 			Name:  "udp",
 			Usage: "enable udp mode",
 		},
-		cli.StringFlag{
+		&cli.StringFlag{
 			Name:  "pprof",
 			Usage: "set the listen address for pprof",
 		},
-		cli.BoolFlag{
+		&cli.BoolFlag{
 			Name:  "proxy",
 			Usage: "enable default proxy(socks4/socks4a/socks5/http)",
 		},
-		cli.BoolFlag{
+		&cli.BoolFlag{
 			Name:  "ssproxy",
 			Usage: "enable shadowsocks proxy",
 		},
-		cli.StringFlag{
+		&cli.StringFlag{
 			Name:  "ssmethod",
 			Value: "multi",
 			Usage: "set the method of shadowsocks proxy",
 		},
-		cli.StringFlag{
+		&cli.StringFlag{
 			Name:  "sskey",
 			Usage: "set the password of shadowsocks proxy",
 		},

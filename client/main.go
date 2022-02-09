@@ -690,7 +690,7 @@ func main() {
 		}
 
 		if config.Proxy {
-			config.proxyAcceptor = ss.GetShadowAcceptor(args)
+			config.proxyAcceptor = ss.GetSocksAcceptor(args)
 		}
 
 		kcpraw.SetNoHTTP(config.NoHTTP)
